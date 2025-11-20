@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+:root {
+  background-color: #1a1c29;
+  color: #e0e0e0;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: 'Lato', sans-serif;
+}
+
+/* Custom Scrollbar for Dialogue */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1c29;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c8aa6e;
+  border-radius: 4px;
+}
