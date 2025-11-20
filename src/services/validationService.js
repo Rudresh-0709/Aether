@@ -39,19 +39,18 @@ export const validationService = {
         };
     },
 
-    validateRoom(data) {
-        const errors = [];
-        if (!data) return { valid: false, errors: ["No data provided"] };
-
-        for (const key in roomSchema) {
-            if (!data[key]) {
-                errors.push(`Missing field: ${key}`);
-            }
+    validateWorld(data) {
+        // Simple structural check before Zod takes over in the Parser
+        if (!data || !data.world) {
+            return { valid: false, errors: ["Missing 'world' root object"] };
         }
 
-        // Fallback/Sanitization
-        if (!data.walls) data.walls = [];
-        if (!data.furniture) data.furniture = [];
+        const { world } = data;
+        const errors = [];
+
+        if (!world.zones || !Array.isArray(world.zones)) errors.push("Missing 'zones' array");
+        if (!world.width) errors.push("Missing world width");
+        if (!world.depth) errors.push("Missing world depth");
 
         return {
             valid: errors.length === 0,

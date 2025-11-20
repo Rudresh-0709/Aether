@@ -38,6 +38,7 @@ function App() {
         {activeNPC && (
           <DialogueUI
             npc={activeNPC}
+            knownClues={knownClues}
             onClose={() => setActiveNPC(null)}
           />
         )}

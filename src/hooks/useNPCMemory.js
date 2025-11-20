@@ -11,19 +11,20 @@ export function useNPCMemory(npc) {
         memoryService.initMemory(npc.id, npc);
     }
 
-    const chat = useCallback(async (message) => {
+    const chat = useCallback(async (interaction) => {
         if (!npc) return;
 
         setIsTyping(true);
         
-        // 1. Update Memory with Player Message
-        memoryService.updateMemory(npc.id, message, "Player");
+        // 1. Update Memory with Player Interaction (Stringified for now)
+        const memoryLog = `[${interaction.tone}] ${interaction.intent} ${interaction.targetClueId ? `(Clue: ${interaction.targetClueId})` : ''}`;
+        memoryService.updateMemory(npc.id, memoryLog, "Player");
 
         // 2. Get Context
         const context = memoryService.getMemoryContext(npc.id);
 
-        // 3. Call LLM
-        const response = await llmService.chatWithNPC(npc, message, context);
+        // 3. Call LLM with Interaction Object
+        const response = await llmService.chatWithNPC(npc, interaction, context);
 
         // 4. Update Memory with NPC Response
         memoryService.updateMemory(npc.id, response, "NPC");
