@@ -26,9 +26,15 @@ export default function GameCanvas({ onInteract, onLoadComplete }) {
             <IsoCamera />
 
             {/* Lighting */}
-            <ambientLight intensity={0.4} color="#2a1a35" />
+            {/* <ambientLight intensity={0.4} color="#2a1a35" /> */}
             <pointLight position={[10, 20, 10]} intensity={0.8} color="#c8aa6e" castShadow />
             <pointLight position={[-10, 10, -10]} intensity={0.5} color="#0AC8B9" />
+            <ambientLight intensity={1} />
+            <directionalLight
+                position={[20, 50, 20]}
+                intensity={2}
+                castShadow
+            />
 
             <Suspense fallback={null}>
                 <group position={[0, 0, 0]}>

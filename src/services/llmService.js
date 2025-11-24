@@ -117,11 +117,20 @@ export const llmService = {
                     "width": number,
                     "depth": number,
                     "walls": [],
-                    "furniture": [],
+                    furniture: [
+                    {
+                        "id": "string",
+                        "type": "desk" | "chair" | "bookshelf" | "cabinet" | "bed" | "lamp" | "sofa" | "rug" | "table",
+                        "name": "string",
+                        "x": number,
+                        "z": number,
+                        "rotation": number
+                    }
+                    ],
                     "clues": [
                     {
                         "id": "string",
-                        "type": "fingerprint" | "weapon" | "note" | "blood" | "footprint",
+                        "type": "fingerprint" | "weapon" | "note" | "blood" | "footprint" | "magnifying_glass" | "bottle",
                         "x": number,
                         "z": number
                     }
@@ -142,13 +151,6 @@ export const llmService = {
         }
         }
 
-        Rules:
-        - Make the world multi-room and multi-zone.
-        - Include indoor (house/building) and outdoor (garden/street/yard) if relevant.
-        - Ensure zones and rooms do NOT overlap.
-        - Place clues in logical places tied to the mystery.
-        - Return ONLY valid JSON.
-
         `;
 
         try {
@@ -164,7 +166,6 @@ export const llmService = {
             const room = JSON.parse(completion.choices[0].message.content);
 
             // Strict Validation using WorldParser
-            // We try to parse it here to ensure it's valid. If not, we fallback.
             try {
                 // We don't need the result, just checking if it throws
                 const { WorldParser } = await import('../world/data/WorldParser');
@@ -187,10 +188,6 @@ export const llmService = {
             return `[MOCK] I am ${npcProfile.name}. You asked about ${interaction.intent}.`;
         }
 
-        // Import constants dynamically or assume they are available if we imported them at top
-        // For now, I'll hardcode the mapping logic here to avoid circular deps or extra imports if not needed
-        // But ideally we import INTENT_PROMPTS from constants.
-
         const INTENT_PROMPTS = {
             "AskAboutVictim": "The player asks you about the victim and your relationship with them.",
             "AskAboutAlibi": "The player asks where you were at the time of the murder.",
@@ -207,7 +204,7 @@ export const llmService = {
 
         let basePrompt = INTENT_PROMPTS[interaction.intent] || "The player asks a question.";
         if (interaction.targetClueId) {
-            basePrompt = basePrompt.replace("{clueContext}", `Clue ID: ${interaction.targetClueId}`);
+            basePrompt = basePrompt.replace("{clueContext}", `Clue ID: ${interaction.targetClueId} `);
         }
 
         const systemPrompt = `
@@ -235,7 +232,7 @@ export const llmService = {
             const completion = await groq.chat.completions.create({
                 messages: [
                     { role: "system", content: systemPrompt },
-                    { role: "user", content: `Recent Chat History:\n${memoryContext.recentHistory}\n\nPlayer Action: [${interaction.tone}] ${interaction.intent}` }
+                    { role: "user", content: `Recent Chat History: \n${memoryContext.recentHistory} \n\nPlayer Action: [${interaction.tone}] ${interaction.intent} ` }
                 ],
                 model: "llama-3.1-8b-instant",
                 temperature: 1,
@@ -305,8 +302,8 @@ export const llmService = {
                                 width: 10, depth: 10,
                                 x: 0, z: 0,
                                 furniture: [
-                                    { id: "desk", name: "victorian_desk", x: 2, z: 2, rotation: 0 },
-                                    { id: "shelf", name: "bookshelf", x: 8, z: 2, rotation: 1.57 }
+                                    { id: "desk", type: "desk", name: "victorian_desk", x: 2, z: 2, rotation: 0 },
+                                    { id: "shelf", type: "bookshelf", name: "bookshelf", x: 8, z: 2, rotation: 1.57 }
                                 ],
                                 clues: [
                                     { id: "c1", type: "note", description: "A torn letter", x: 2.5, z: 2.2 }

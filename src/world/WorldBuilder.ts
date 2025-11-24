@@ -130,6 +130,9 @@ export class WorldBuilder {
             // Build Props inside Room
             this.buildProps(room, roomNode);
 
+            // Build Clues inside Room
+            this.buildClues(room, roomNode);
+
             // Advance X
             currentRoomX += width + this.config.roomPadding;
         });
@@ -183,12 +186,48 @@ export class WorldBuilder {
                 children: [],
                 parentId: roomNode.id,
                 metadata: { original: prop },
-                asset: getAsset(prop.name) // Hydrate asset
+                asset: getAsset(prop.type || prop.name) // Hydrate asset
             };
 
-            this.scene.layers.objects.nodes.push(propNode);
             this.scene.nodeMap.set(propNode.id, propNode);
             roomNode.children.push(propNode);
+        });
+    }
+
+    private buildClues(room: Room, roomNode: SceneNode) {
+        if (!room.clues || room.clues.length === 0) return;
+
+        room.clues.forEach(clue => {
+            const relX = clue.transform.position.x;
+            const relY = clue.transform.position.y;
+
+            const gridPos: Vector3 = {
+                x: roomNode.gridPosition.x + relX,
+                y: roomNode.gridPosition.y + relY,
+                z: roomNode.gridPosition.z
+            };
+
+            const isoPos = toIso(gridPos.x, gridPos.y, gridPos.z);
+
+            const clueNode: SceneNode = {
+                id: clue.id,
+                type: 'clue',
+                name: `Clue: ${clue.clueType}`,
+                gridPosition: gridPos,
+                gridSize: { width: 0.5, depth: 0.5, height: 0.5 },
+                isoPosition: isoPos,
+                zIndex: 25, // Above props
+                color: '#ff0000', // Default clue color
+                visible: true,
+                children: [],
+                parentId: roomNode.id,
+                metadata: { original: clue },
+                asset: getAsset(clue.clueType) // Lookup by specific clue type
+            };
+
+            this.scene.layers.objects.nodes.push(clueNode);
+            this.scene.nodeMap.set(clueNode.id, clueNode);
+            roomNode.children.push(clueNode);
         });
     }
 }

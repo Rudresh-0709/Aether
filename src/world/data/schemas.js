@@ -23,6 +23,7 @@ const ClueSchema = z.object({
 
 const FurnitureSchema = z.object({
     id: z.string().optional(),
+    type: z.string(), // Strict key for AssetRegistry
     name: z.string(), // Semantic tag, e.g., "victorian_desk"
     x: z.number(),
     z: z.number(),

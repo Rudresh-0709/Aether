@@ -37,7 +37,7 @@ export function useGenerativeMystery() {
                             size: { width: r.width, depth: r.depth },
                             props: r.furniture.map(f => ({
                                 ...f,
-                                type: 'furniture',
+                                type: f.type || 'furniture',
                                 transform: { position: { x: f.x, y: f.z, z: 0 }, rotation: f.rotation }
                             })),
                             clues: r.clues.map(c => ({
